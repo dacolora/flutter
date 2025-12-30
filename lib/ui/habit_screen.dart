@@ -1,0 +1,141 @@
+import 'package:flutter/material.dart';
+import 'package:mylifegame/ui/habit_card.dart';
+import 'package:mylifegame/ui/hait_add_screen.dart';
+import 'package:mylifegame/ui/ui_token.dart';
+import '../../core/time.dart';
+import '../../domain/entities/habit_log.dart';
+import '../infraestructure/service/app_scope.dart';
+import 'habit_calendar_screen.dart';
+
+class HabitsScreen extends StatelessWidget {
+  const HabitsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppScope.of(context);
+    final habits = c.habitController;
+
+    return AnimatedBuilder(
+      animation: habits,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('My Habits'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HabitCalendarScreen()),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HabitAddScreen()),
+                ),
+              ),
+            ],
+          ),
+          body: habits.loading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _TopWeekHeader(day: habits.today),
+                    const SizedBox(height: 12),
+                    if (habits.error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(habits.error!, style: const TextStyle(color: UiTokens.danger)),
+                      ),
+                    ...habits.habits.map((h) {
+                      final week = habits.weekDaysFrom(habits.today);
+                      final dueToday = h.schedule.isDueOn(Time.isoWeekday(habits.today));
+                      return HabitCard(
+                        habit: h,
+                        weekDays: week,
+                        isDueToday: dueToday,
+                        statusOf: (d) => habits.statusOf(h.id, d),
+                        onTapDay: (d) => _openDayPicker(context, h.title, (status) {
+                          habits.setStatus(h, d, status);
+                        }),
+                      );
+                    }),
+                    const SizedBox(height: 80),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openDayPicker(
+    BuildContext context,
+    String habitTitle,
+    void Function(HabitDayStatus status) onPick,
+  ) async {
+    await showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: UiTokens.card,
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(habitTitle, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          const SizedBox(height: 12),
+          _PickTile('✅ Completar', UiTokens.neonGreen, () => onPick(HabitDayStatus.done)),
+          _PickTile('❌ Fallé', UiTokens.danger, () => onPick(HabitDayStatus.missed)),
+          _PickTile('⏭ Skip (sin castigo)', UiTokens.textSoft, () => onPick(HabitDayStatus.skipped)),
+          _PickTile('⏳ Pendiente', UiTokens.textSoft, () => onPick(HabitDayStatus.pending)),
+        ]),
+      ),
+    );
+  }
+}
+
+class _PickTile extends StatelessWidget {
+  const _PickTile(this.text, this.color, this.onTap);
+
+  final String text;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w800)),
+      onTap: () {
+        Navigator.pop(context);
+        onTap();
+      },
+    );
+  }
+}
+
+class _TopWeekHeader extends StatelessWidget {
+  const _TopWeekHeader({required this.day});
+  final DateTime day;
+
+  @override
+  Widget build(BuildContext context) {
+    final weekStart = day.subtract(Duration(days: day.weekday - 1));
+    return Container(
+      decoration: UiTokens.neonCard(),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          const Icon(Icons.emoji_events, color: UiTokens.neonBlue),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Semana: ${Time.ymd(weekStart)} → ${Time.ymd(weekStart.add(const Duration(days: 6)))}',
+              style: const TextStyle(color: UiTokens.textSoft, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
