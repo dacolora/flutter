@@ -24,11 +24,10 @@ class XpVarosPills extends StatelessWidget {
       runSpacing: 8,
       children: [
         _pill('+$xp XP', UiTokens.neonBlue),
-        _pill('+$varos Varos', UiTokens.neonGreen),
+        _pill('+\$ $varos', UiTokens.neonGreen),
         if (hp > 0) _pill('+$hp HP', UiTokens.neonGreen),
-        _pill('-$xpLoss XP (fallar)', UiTokens.danger),
-        _pill('-$hpLoss HP (fallar)', UiTokens.danger),
-        _pill('Varos NO bajan al fallar', UiTokens.textSoft),
+        _pill('-$xpLoss XP', UiTokens.danger),
+        _pill('-$hpLoss HP ', UiTokens.danger),
       ],
     );
   }

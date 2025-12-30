@@ -7,20 +7,13 @@ abstract class GameRepository {
   Future<void> apply(ActionEntry entry);
 }
 
-
 class StorageRepository {
   final LocalStorage _storage;
 
   StorageRepository(this._storage);
 
   Future<List<LifeArea>> loadLifeAreas() async {
-    final data = await _storage.read('life_areas');
-    if (data == null) {
-      return LifeAreaRepository.defaultLifeAreas();
-    }
-    return (data as List<dynamic>)
-        .map((e) => LifeArea.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return LifeAreaRepository.defaultLifeAreas();
   }
 
   Future<PlayerState> loadPlayerState(List<LifeArea> lifeAreas) async {

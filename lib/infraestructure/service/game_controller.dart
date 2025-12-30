@@ -115,6 +115,21 @@ Future<void> addAction(ActionEntry entry) async {
 
     return progress.copyWith(level: level, xpInLevel: xpInLevel);
   }
+  
+
+  void updateAreaXp(LifeArea area, int xpDelta) {
+  final currentProgress = _state.areas[area];
+  if (currentProgress != null) {
+    final updatedProgress = _applyXp(currentProgress, xpDelta);
+    _state = _state.copyWith(
+      areas: {
+        ..._state.areas,
+        area: updatedProgress,
+      },
+    );
+    notifyListeners(); // Notifica a los widgets que escuchan este controlador
+  }
+}
 
   // --- Shop
   Future<void> buyItem(ShopItem item) async {

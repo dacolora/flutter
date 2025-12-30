@@ -18,7 +18,7 @@ class WeekDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const labels = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    const labels = ['Lu', 'Ma', 'Mi', 'Jue', 'Vi', 'Sa', 'Do'];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

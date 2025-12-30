@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mylifegame/ui/habit_card.dart';
-import 'package:mylifegame/ui/hait_add_screen.dart';
+import 'package:mylifegame/ui/habit_add_screen.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import '../../core/time.dart';
 import '../../domain/entities/habit_log.dart';
 import '../infraestructure/service/app_scope.dart';
-import 'habit_calendar_screen.dart';
 
 class HabitsScreen extends StatelessWidget {
   const HabitsScreen({super.key});
@@ -19,16 +18,13 @@ class HabitsScreen extends StatelessWidget {
       animation: habits,
       builder: (context, _) {
         return Scaffold(
+          backgroundColor: Colors.black,
           appBar: AppBar(
-            title: const Text('My Habits'),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            title: const Text('Mis Habitos'),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.calendar_month),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HabitCalendarScreen()),
-                ),
-              ),
+         
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () => Navigator.push(

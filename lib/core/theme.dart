@@ -38,6 +38,10 @@ ThemeData buildNeonTheme() {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radius)),
     ),
     inputDecorationTheme: InputDecorationTheme(
+            labelStyle: TextStyle(color: Colors.white),
+      hintStyle: TextStyle(color: Colors.white),
+      helperStyle: TextStyle(color: Colors.white),
+      prefixStyle: TextStyle(color: Colors.white),
       filled: true,
       fillColor: UiTokens.card,
       border: OutlineInputBorder(

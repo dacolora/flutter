@@ -4,7 +4,6 @@ import 'package:mylifegame/domain/entities/action_entry.dart';
 import 'package:mylifegame/domain/entities/life_area.dart';
 import 'package:mylifegame/infraestructure/service/app_scope.dart';
 import 'package:mylifegame/ui/habit_screen.dart';
-import 'package:mylifegame/ui/life_area_settings_screen.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import 'package:mylifegame/widgets/section_title.dart';
 import '../../core/constants.dart';
@@ -22,41 +21,33 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final c = AppScope.of(context);
+    final c = AppScope.of(context);
     final game = c.gameController;
 
     final s = game.state;
 
     return AnimatedBuilder(
-       animation: game,
+      animation: game,
       builder: (context, _) => Scaffold(
         appBar: AppBar(
           title: const Text('Life RPG'),
           actions: [
-            Builder(builder: (ctx) => IconButton(
-              onPressed: () => Navigator.push(
-                ctx,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            Builder(
+              builder: (ctx) => IconButton(
+                onPressed: () => Navigator.push(
+                  ctx,
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                ),
+                icon: const Icon(Icons.settings),
               ),
-              icon: const Icon(Icons.settings),
-            ),),
-             IconButton(
+            ),
+            IconButton(
               icon: const Icon(Icons.grid_view_rounded),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const HabitsScreen()),
               ),
             ),
-            IconButton(
-  icon: Icon(Icons.settings),
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LifeAreaSettingsScreen()),
-    );
-  },
-),
-            
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
@@ -76,30 +67,47 @@ class DashboardScreen extends StatelessWidget {
               child: _DeathBanner(state: s),
             ),
             Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            decoration: UiTokens.neonCard(),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Player HUD', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-                const SizedBox(height: 12),
-                Text('HP: ${game.hp}/1000', style: const TextStyle(color: UiTokens.textSoft)),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(value: game.hp / 1000, minHeight: 10),
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                decoration: UiTokens.neonCard(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Player HUD',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'HP: ${game.hp}/1000',
+                      style: const TextStyle(color: UiTokens.textSoft),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: game.hp / 1000,
+                        minHeight: 10,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Varos: ${game.varos}',
+                      style: const TextStyle(color: UiTokens.textSoft),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Tip: Completa hábitos para subir XP por área. Fallar baja XP + HP, nunca Varos.',
+                      style: TextStyle(color: UiTokens.textSoft),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 14),
-                Text('Varos: ${game.varos}', style: const TextStyle(color: UiTokens.textSoft)),
-                const SizedBox(height: 14),
-                const Text('Tip: Completa hábitos para subir XP por área. Fallar baja XP + HP, nunca Varos.',
-                    style: TextStyle(color: UiTokens.textSoft)),
-              ],
+              ),
             ),
-          ),
-        ),
             _TopStatsRow(state: s),
             const SectionTitle('Áreas (XP / Nivel)'),
             ...s.areas.values.map((p) => AreaProgressCard(progress: p)),
@@ -156,7 +164,7 @@ class _TopStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final controller = AppScope.of(context);
+    final controller = AppScope.of(context);
     final s = controller.gameController.state;
     final hpPct = (s.hp / AppConstants.maxHp).clamp(0.0, 1.0);
 

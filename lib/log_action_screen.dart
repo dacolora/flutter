@@ -14,7 +14,7 @@ class LogActionScreen extends StatefulWidget {
 class _LogActionScreenState extends State<LogActionScreen> {
   ActionType _type = ActionType.goodHabit;
   LifeArea? _area;
-  List<LifeArea> _lifeAreas = [];
+  final List<LifeArea> _lifeAreas = LifeAreaRepository.defaultLifeAreas();
 
   final _title = TextEditingController();
   final _notes = TextEditingController();
@@ -30,22 +30,8 @@ class _LogActionScreenState extends State<LogActionScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadLifeAreas();
-  }
 
-  Future<void> _loadLifeAreas() async {
-    final repository = LifeAreaRepository();
-    final areas = await repository.getLifeAreas();
-    setState(() {
-      _lifeAreas = areas;
-      if (_lifeAreas.isNotEmpty) {
-        _area = _lifeAreas.first; // Selecciona la primera área por defecto
-      }
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
