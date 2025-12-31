@@ -10,9 +10,7 @@ class GetHabits {
 
   Future<Result<List<Habit>>> call(List<LifeArea> lifeAreas) async {
     try {
-          print('Intentando cargar hábitos...');
       final habits = await _repo.getHabits(lifeAreas);
-          print('Hábitos cargados: ${habits.length}');
       habits.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       return Ok(habits);
     } catch (e) {

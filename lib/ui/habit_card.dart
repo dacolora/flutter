@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifegame/infraestructure/habit_state_controller.dart';
 import 'package:mylifegame/ui/habit_history_screen.dart';
+import 'package:mylifegame/ui/habit_month.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import '../../domain/entities/habit.dart';
 import '../../domain/entities/habit_log.dart';
@@ -28,63 +29,44 @@ class HabitCard extends StatelessWidget {
     final area = habit.area;
     final areaLabel = area?.label ?? 'Sin área';
 
-    print(statusOf.toString());
 
-    return GestureDetector(
-      onTap: () {
-        final habitStateController = HabitStateController(); // Crear instancia si es necesario
-        final habitDetails = habitStateController.getLogsForHabit(habit.id); // Asegurarse de que habit.id está definido
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HabitHistoryScreen(
-              habitName: habit.title,
-              xp: habit.rewards.xp,
-              varos: habit.rewards.varos,
-              hp: habit.rewards.hp,
-              history: habitDetails, // Pasar directamente la lista de logs
-            ),
-          ),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: UiTokens.neonCard(),
-        padding: const EdgeInsets.all(14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  habit.title,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
-                ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: UiTokens.neonCard(),
+      padding: const EdgeInsets.all(14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                habit.title,
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
               ),
-              if (!isDueToday)
-                const Padding(
-                  padding: EdgeInsets.only(left: 8),
-                  child: Text('OFF', style: TextStyle(color: UiTokens.textSoft, fontWeight: FontWeight.w800)),
-                )
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(areaLabel, style: const TextStyle(color: UiTokens.textSoft)),
-          const SizedBox(height: 10),
-          XpVarosPills(
-            xp: habit.rewards.xp,
-            varos: habit.rewards.varos,
-            hp: habit.rewards.hp,
-            xpLoss: habit.penalties.xpLoss,
-            hpLoss: habit.penalties.hpLoss,
-          ),
-          const SizedBox(height: 10),
-          WeekDots(
-            days: weekDays,
-            statusOf: statusOf,
-            onTap: onTapDay,
-          ),
-        ]),
-      ),
+            ),
+            if (!isDueToday)
+              const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Text('OFF', style: TextStyle(color: UiTokens.textSoft, fontWeight: FontWeight.w800)),
+              )
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(areaLabel, style: const TextStyle(color: UiTokens.textSoft)),
+        const SizedBox(height: 10),
+        XpVarosPills(
+          xp: habit.rewards.xp,
+          varos: habit.rewards.varos,
+          hp: habit.rewards.hp,
+          xpLoss: habit.penalties.xpLoss,
+          hpLoss: habit.penalties.hpLoss,
+        ),
+        const SizedBox(height: 10),
+        WeekDots(
+          days: weekDays,
+          statusOf: statusOf,
+          onTap: onTapDay,
+        ),
+      ]),
     );
   }
 }

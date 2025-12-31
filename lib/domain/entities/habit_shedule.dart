@@ -18,6 +18,7 @@ class HabitSchedule {
   final int? targetCount;
 
   bool isDueOn(int isoWeekday) {
+    print(isoWeekday);
     switch (frequency) {
       case HabitFrequency.daily:
         return true;

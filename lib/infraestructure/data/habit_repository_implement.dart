@@ -16,7 +16,6 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
 Future<List<Habit>> getHabits(List<LifeArea> lifeAreas) async {
   try {
-    print('Leyendo hábitos del almacenamiento...');
     final json = await jsonStore.read(); // Lee el almacenamiento
     final list = (json[_kHabits] as List<dynamic>? ?? [])
         .map((e) {
@@ -29,10 +28,8 @@ Future<List<Habit>> getHabits(List<LifeArea> lifeAreas) async {
         })
         .whereType<Habit>() // Filtrar los valores nulos
         .toList();
-    print('Hábitos leídos: $list');
     return list;
   } catch (e) {
-    print('Error en HabitRepository: $e');
     throw Exception('No se pudieron cargar hábitos');
   }
 }

@@ -325,9 +325,28 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
     }
   }
 
+  List<DateTime> getDaysInMonth(int year, int month) {
+  final firstDay = DateTime(year, month, 1);
+  final lastDay = DateTime(year, month + 1, 0); // Último día del mes
+  return List.generate(
+    lastDay.day,
+    (index) => DateTime(year, month, index + 1),
+  );
+}
+
+String formatDate(DateTime date) {
+  return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+}
+
+String _daysFull(List<DateTime> days) {
+  return days.map((d) => formatDate(d)).join(', ');
+}
+
   String _daysShort(List<int> days) {
     const map = {1: 'Mo', 2: 'Tu', 3: 'We', 4: 'Th', 5: 'Fr', 6: 'Sa', 7: 'Su'};
     final list = days.map((d) => map[d] ?? '?').toList();
     return list.join(', ');
   }
+
+  
 }

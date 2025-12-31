@@ -3,6 +3,7 @@ import 'package:mylifegame/core/local_storage.dart';
 import 'package:mylifegame/infraestructure/data/game_repository_implement.dart';
 import 'package:mylifegame/infraestructure/data/habit_repository_implement.dart';
 import 'package:mylifegame/infraestructure/data/json_store.dart';
+import 'package:mylifegame/infraestructure/habit_state_controller.dart';
 import 'package:mylifegame/infraestructure/service/habit_engine.dart';
 import 'package:mylifegame/infraestructure/service/usecase/add_habit.dart';
 import 'package:mylifegame/infraestructure/service/usecase/get_habit.dart';
@@ -61,13 +62,14 @@ class _AppScopeState extends State<AppScope> {
         gameRepo: gameRepo,
         engine: engine,
       );
-
+    // Inicializa HabitStateController
+    final habitStateController = HabitStateController();
       // Presentation controllers
       final habitController = HabitController(
         habitRepo: habitRepo,
         getHabits: getHabits,
         addHabit: addHabit,
-        toggleHabitForDay: toggle, lifeAreas: lifeAreas,
+        toggleHabitForDay: toggle, lifeAreas: lifeAreas, habitStateController: habitStateController,
       );
 
       _controllers = AppControllers(
