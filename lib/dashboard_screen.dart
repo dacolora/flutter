@@ -29,7 +29,10 @@ class DashboardScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: game,
       builder: (context, _) => Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
           title: const Text('Life RPG'),
           actions: [
             Builder(
@@ -66,51 +69,16 @@ class DashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: _DeathBanner(state: s),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                decoration: UiTokens.neonCard(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Player HUD',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'HP: ${game.hp}/1000',
-                      style: const TextStyle(color: UiTokens.textSoft),
-                    ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: game.hp / 1000,
-                        minHeight: 10,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Varos: ${game.varos}',
-                      style: const TextStyle(color: UiTokens.textSoft),
-                    ),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'Tip: Completa hábitos para subir XP por área. Fallar baja XP + HP, nunca Varos.',
-                      style: TextStyle(color: UiTokens.textSoft),
-                    ),
-                  ],
-                ),
-              ),
+
+            _TopStatsRow(state: s, game: game),
+            StatCard(
+              title: 'Varos',
+              value: Fmt.money(s.varos),
+              subtitle: 'Moneda ficticia para placer controlado.',
             ),
-            _TopStatsRow(state: s),
             const SectionTitle('Áreas (XP / Nivel)'),
-            ...s.areas.values.map((p) => AreaProgressCard(progress: p)),
+            AreaProgressGroup(),
+                const SectionTitle('Áreas (XP / Nivel)'),
             const SectionTitle('Historial (último primero)'),
             ...s.history.take(12).map((e) => _HistoryTile(e)),
             const SizedBox(height: 90),
@@ -120,6 +88,26 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class AreaProgressGroup extends StatelessWidget {
+
+    @override
+  Widget build(BuildContext context) {
+    final List<Widget> list = [];
+            final c = AppScope.of(context);
+    final game = c.gameController;
+
+    final playerState = game.state;
+        for (final entry in playerState.areas.entries) {
+  final progress = entry.value;
+  list.add(AreaProgressCard(progress: progress));
+}
+
+    return  Column(children: list,);
+}
+
 }
 
 class _BottomBar extends StatelessWidget {
@@ -159,48 +147,60 @@ class _BottomBar extends StatelessWidget {
 }
 
 class _TopStatsRow extends StatelessWidget {
-  const _TopStatsRow({required this.state});
+  const _TopStatsRow({required this.state, required this.game});
   final PlayerState state;
+  final GameController game;
 
   @override
   Widget build(BuildContext context) {
     final controller = AppScope.of(context);
     final s = controller.gameController.state;
-    final hpPct = (s.hp / AppConstants.maxHp).clamp(0.0, 1.0);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          StatCard(
-            title: 'HP (Vida)',
-            value: '${s.hp} / ${AppConstants.maxHp}',
-            subtitle: s.isDead
-                ? 'GAME OVER'
-                : 'Mantén el respeto por ti mismo.',
-            trailing: SizedBox(
-              width: 90,
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(value: hpPct, minHeight: 10),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${(hpPct * 100).toStringAsFixed(0)}%',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+      padding: const EdgeInsets.all(8),
+      child: Container(
+        decoration: UiTokens.neonCard(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Player HUD',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
+                color: Colors.white,
               ),
             ),
-          ),
-          StatCard(
-            title: 'Varos',
-            value: Fmt.money(s.varos),
-            subtitle: 'Moneda ficticia para placer controlado.',
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              'HP: ${game.hp}/1000',
+              style: const TextStyle(color: UiTokens.textSoft),
+            ),
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: game.hp / 1000,
+                minHeight: 10,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Varos: ${game.varos}',
+              style: const TextStyle(color: UiTokens.textSoft),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'Tip: Completa hábitos para subir XP por área. Fallar baja XP + HP, nunca Varos.',
+              style: TextStyle(color: UiTokens.textSoft),
+            ),
+            Text(
+              s.isDead ? 'GAME OVER' : 'Mantén el respeto por ti mismo.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
     final habitStateController = HabitStateController();
+    
   await habitStateController.loadLogs();
 
   runApp(const LifeRpgApp());

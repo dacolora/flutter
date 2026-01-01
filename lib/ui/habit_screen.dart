@@ -22,7 +22,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
     return AnimatedBuilder(
       animation: habits,
       builder: (context, _) {
-            print('Redibujando UI');
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
@@ -55,10 +54,8 @@ class _HabitsScreenState extends State<HabitsScreen> {
                         ),
                       ),
                     ...habits.habits.map((h) {
-                      getDynamicWeekDays(
-                        habits.today,
-                      ); // Últimos 7 días
-                      final last7Days = getDynamicWeekDays(
+                      getLast7Days(habits.today); // Últimos 7 días
+                      final last7Days = getLast7Days(
                         DateTime.now(),
                       ); // Últimos 7 días
 
@@ -69,18 +66,23 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       yearlyStatus.keys
                           .where((d) => d.month == DateTime.now().month)
                           .toList();
-          
 
                       return GestureDetector(
                         onTap: () => Navigator.push(
-                          
                           context,
                           MaterialPageRoute(
                             builder: (_) => HabitsMonthScreen(
-                              
+                              habitId: h.id,
+                              habit: h,
                               day: yearlyStatus.keys.toList(),
-                              statusOf: (d) =>
-                                  habits.statusOf(h.id, d),
+                              statusOf: (d) => habits.statusOf(h.id, d),
+                              onTapDay: (DateTime d) {
+                                  print('Actualizando estado global para el día: $d');
+                                _openDayPicker(context, h.title, (status) {
+                                  habits.setStatus(h, d, status);
+                                  setState(() {});
+                                });
+                              },
                             ),
                           ),
                         ),
@@ -92,12 +94,10 @@ class _HabitsScreenState extends State<HabitsScreen> {
                           ),
                           statusOf: (d) => habits.statusOf(h.id, d),
                           onTapDay: (d) {
-                              _openDayPicker(context, h.title, (status) {
-                                habits.setStatus(h, d, status);
-                              });
-                              setState(() {
-                                
-                              });
+                            _openDayPicker(context, h.title, (status) {
+                              habits.setStatus(h, d, status);
+                            });
+                            setState(() {});
                           },
                         ),
                       );
@@ -110,21 +110,11 @@ class _HabitsScreenState extends State<HabitsScreen> {
     );
   }
 
-  List<DateTime> getDynamicWeekDays(DateTime today) {
-    final weekStart = today.subtract(
-      Duration(days: today.weekday - 1),
-    ); // Lunes
-    final weekDays = List.generate(
-      7,
-      (index) => weekStart.add(Duration(days: index)),
-    );
-
-    // Reorganiza los días para que el día actual esté al final
-    final todayIndex = today.weekday - 1; // Índice del día actual (0 = lunes)
-    return [
-      ...weekDays.sublist(todayIndex + 1), // Días restantes de la semana
-      ...weekDays.sublist(0, todayIndex + 1), // Días anteriores al día actual
-    ];
+  List<DateTime> getLast7Days(DateTime today) {
+    final start = today.subtract(
+      const Duration(days: 6),
+    ); // Hace 6 días desde hoy
+    return List.generate(7, (index) => start.add(Duration(days: index)));
   }
 
   Future<void> _openDayPicker(
@@ -202,7 +192,7 @@ class _TopWeekHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final weekDays = getDynamicWeekDays(day); // Usa el método dinámico
+    final weekDays = getLast7Days(day); // Usa el método dinámico
     final weekStart = weekDays.first;
     final weekEnd = weekDays.last;
 
@@ -226,19 +216,11 @@ class _TopWeekHeader extends StatelessWidget {
       ),
     );
   }
-}
 
-List<DateTime> getDynamicWeekDays(DateTime today) {
-  final weekStart = today.subtract(Duration(days: today.weekday - 1)); // Lunes
-  final weekDays = List.generate(
-    7,
-    (index) => weekStart.add(Duration(days: index)),
-  );
-
-  // Reorganiza los días para que el día actual esté al final
-  final todayIndex = today.weekday - 1; // Índice del día actual (0 = lunes)
-  return [
-    ...weekDays.sublist(todayIndex + 1), // Días restantes de la semana
-    ...weekDays.sublist(0, todayIndex + 1), // Días anteriores al día actual
-  ];
+  List<DateTime> getLast7Days(DateTime today) {
+    final start = today.subtract(
+      const Duration(days: 6),
+    ); // Hace 6 días desde hoy
+    return List.generate(7, (index) => start.add(Duration(days: index)));
+  }
 }

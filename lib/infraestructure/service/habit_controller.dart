@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:mylifegame/domain/entities/life_area.dart';
 import 'package:mylifegame/infraestructure/habit_state_controller.dart';
 import 'package:mylifegame/infraestructure/service/usecase/add_habit.dart';
 import 'package:mylifegame/infraestructure/service/usecase/get_habit.dart';
 import 'package:mylifegame/infraestructure/service/usecase/toggle_habit_for_day.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/time.dart';
 import '../../../domain/entities/habit.dart';
@@ -44,34 +47,88 @@ class HabitController extends ChangeNotifier {
 
   DateTime get today => Time.startOfDay(DateTime.now());
 
-  Future<void> load() async {
-    loading = true;
-    error = null;
-    notifyListeners();
+int calculateTotalRewards(String habitId) {
+  final logs = _stateController.getLogsForHabit(habitId); // Obtén los logs del hábito
+  final habit = habits.firstWhere((h) => h.id == habitId); // Obtén el hábito correspondiente
 
-    final res = await _getHabits(lifeAreas); // Pasa la lista de áreas aquí
-    res.when(
-      ok: (list) async {
-        habits = list.where((h) => h.isActive).toList();
-
-        // Cargar los logs de los hábitos
-        _logs.clear();
-        for (final habit in habits) {
-          final logs = await _stateController.getLogsForHabit(habit.id);
-          _logs.addAll(logs);
-        }
-
-        await _warmWeekCache();
-        loading = false;
-        notifyListeners();
-      },
-      err: (e) {
-        error = e.message;
-        loading = false;
-        notifyListeners();
-      },
-    );
+  return logs.fold(0, (sum, log) {
+    if (log.status == HabitDayStatus.done) {
+      return sum + habit.rewards.xp; // Usa los rewards del hábito
+    }
+     if (log.status == HabitDayStatus.missed) {
+      return sum - habit.penalties.xpLoss; // Usa los rewards del hábito
+    }
+    return sum;
+  });
+}
+  Future<void> createHabit(Habit habit) async {
+    habits.add(habit); // Agrega el hábito a la lista en memoria
+    await _saveHabitsToSharedPreferences(); // Guarda los hábitos en SharedPreferences
+    notifyListeners(); // Notifica a la UI para que se redibuje
   }
+
+  Future<void> _saveHabitsToSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final habitsJson = habits.map((habit) => habit.toJson()).toList();
+    await prefs.setString('habits', jsonEncode(habitsJson));
+    print('Hábitos guardados: $habitsJson');
+  }
+
+  Future<void> loadHabitsFromSharedPreferences(playerState) async {
+    final prefs = await SharedPreferences.getInstance();
+    final habitsJson = prefs.getString('habits');
+    if (habitsJson != null) {
+      final List<dynamic> decoded = jsonDecode(habitsJson);
+      habits.clear();
+      habits.addAll(decoded.map((json) => Habit.fromJson(json,lifeAreas)).toList());
+    }
+          playerState.updateAreaProgress(habits);
+  }
+
+
+void updateHabit(Habit updatedHabit) {
+  final index = habits.indexWhere((h) => h.id == updatedHabit.id);
+  if (index != -1) {
+    habits[index] = updatedHabit; // Actualiza el hábito en la lista
+    saveHabits(); // Guarda los cambios en el almacenamiento persistente
+    notifyListeners(); // Notifica a la UI para que se redibuje
+  }
+}
+
+Future<void> saveHabits() async {
+  final prefs = await SharedPreferences.getInstance();
+  final habitsJson = habits.map((habit) => habit.toJson()).toList();
+  await prefs.setString('habits', jsonEncode(habitsJson));
+  print('Hábitos guardados: $habitsJson');
+}
+
+
+int calculateTotalHP(String habitId) {
+  final logs = _stateController.getLogsForHabit(habitId); // Obtén los logs del hábito
+  final habit = habits.firstWhere((h) => h.id == habitId); // Obtén el hábito correspondiente
+
+  return logs.fold(0, (sum, log) {
+    if (log.status == HabitDayStatus.done) {
+      return sum + habit.rewards.hp; // Usa los rewards del hábito
+    }
+        if (log.status == HabitDayStatus.missed) {
+      return sum + habit.penalties.hpLoss; // Usa los rewards del hábito
+    }
+    return sum;
+  });
+}
+int calculateTotalVaros(String habitId) {
+  final logs = _stateController.getLogsForHabit(habitId); // Obtén los logs del hábito
+  final habit = habits.firstWhere((h) => h.id == habitId); // Obtén el hábito correspondiente
+
+  return logs.fold(0, (sum, log) {
+    if (log.status == HabitDayStatus.done) {
+      return sum + habit.rewards.varos; // Usa los rewards del hábito
+    }
+    return sum;
+  });
+}
+
 
   Map<DateTime, HabitDayStatus> getYearlyStatus(String habitId, int year) {
     final Map<DateTime, HabitDayStatus> yearlyStatus = {};
@@ -105,17 +162,6 @@ class HabitController extends ChangeNotifier {
           orElse: () => HabitLog.forDay(habitId: habitId, day: day),
         )
         .status;
-  }
-
-  Future<void> createHabit(Habit habit) async {
-    final res = await _addHabit(habit);
-    res.when(
-      ok: (_) => load(),
-      err: (e) {
-        error = e.message;
-        notifyListeners();
-      },
-    );
   }
 
   /// Week view helpers

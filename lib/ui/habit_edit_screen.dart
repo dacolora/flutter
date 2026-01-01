@@ -7,19 +7,21 @@ import '../../domain/entities/life_area.dart';
 import '../infraestructure/service/app_scope.dart';
 
 /// Add Habit (como tu referencia, pero estilo My Life Game)
-class HabitAddScreen extends StatefulWidget {
-  const HabitAddScreen({super.key});
+class HabitEditScreen extends StatefulWidget {
+    final Habit habit;
+
+  const HabitEditScreen({super.key, required this.habit});
 
   @override
-  State<HabitAddScreen> createState() => _HabitAddScreenState();
+  State<HabitEditScreen> createState() => _HabitEditScreenState();
 }
 
-class _HabitAddScreenState extends State<HabitAddScreen> {
-  final _title = TextEditingController();
-  final _desc = TextEditingController();
+class _HabitEditScreenState extends State<HabitEditScreen> {
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
 
-  LifeArea? _area;
-  HabitDifficulty _difficulty = HabitDifficulty.normal;
+  late LifeArea? _area;
+  late HabitDifficulty _difficulty = HabitDifficulty.easy;
   HabitSchedule _schedule = const HabitSchedule(
     frequency: HabitFrequency.daily,
   );
@@ -29,14 +31,18 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
 
   @override
   void dispose() {
-    _title.dispose();
-    _desc.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+        _titleController = TextEditingController(text: widget.habit.title);
+    _descriptionController = TextEditingController(text: widget.habit.description ?? '');
+    _difficulty = widget.habit.difficulty;
+   _area = widget.habit.area;
     _loadLifeAreas();
   }
 
@@ -58,34 +64,23 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
     if (res != null) setState(() => _schedule = res);
   }
 
-  Future<void> _save() async {
-    final t = _title.text.trim();
-    if (t.isEmpty) {
-      _snack('Ponle nombre al hábito.');
-      return;
-    }
-
-    setState(() => _saving = true);
-
-    final habit = Habit.create(
-      title: t,
-      description: _desc.text.trim().isEmpty ? null : _desc.text.trim(),
+  void _save() {
+    final updatedHabit = widget.habit.update(
+      title: _titleController.text,
+      description: _descriptionController.text,
       area: _area,
-      schedule: _schedule,
       difficulty: _difficulty,
+      schedule: _schedule,
+      
     );
 
-    await AppScope.of(context).habitController.createHabit(habit);
+    final habits = AppScope.of(context).habitController;
+    habits.updateHabit(updatedHabit); // Llama al método para actualizar el hábito
 
-    if (mounted) {
-      setState(() => _saving = false);
-      Navigator.pop(context);
-    }
+    Navigator.pop(context); // Regresa a la pantalla anterior
   }
 
-  void _snack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,12 +108,12 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _sectionTitle('Quest Info'),
+          _sectionTitle('Informacion'),
           const SizedBox(height: 10),
 
           TextField(
             style: TextStyle(color: Colors.white),
-            controller: _title,
+            controller: _titleController,
             
             decoration: const InputDecoration(
               labelStyle: TextStyle(color: Colors.white),
@@ -132,7 +127,8 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
           const SizedBox(height: 12),
 
           TextField(
-            controller: _desc,
+              style: TextStyle(color: Colors.white),
+            controller: _descriptionController,
             decoration: const InputDecoration(
                  labelStyle: TextStyle(color: Colors.white),
               hintStyle: TextStyle(color: Colors.white),
@@ -179,10 +175,7 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
                     dropdownColor: UiTokens.card,
                     underline: const SizedBox.shrink(),
                     items: [
-                      const DropdownMenuItem(
-                        value: null,
-                        child: Text('Sin área'),
-                      ),
+              
                       ..._lifeAreas.map(
                         (a) => DropdownMenuItem(value: a, child: Text(a.label,style: TextStyle(color: Colors.white),)),
                       ),
@@ -197,7 +190,7 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
                     style: TextStyle(fontWeight: FontWeight.w900,color: Colors.white),
                   ),
                   subtitle: Text(
-                    difficultyLabel(_difficulty),
+                    _difficultyLabel(_difficulty),
                     style: const TextStyle(color: UiTokens.textSoft),
                   ),
                   trailing: DropdownButton<HabitDifficulty>(
@@ -209,7 +202,7 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
                         .map(
                           (d) => DropdownMenuItem(
                             value: d,
-                            child: Text(difficultyLabel(d),style: TextStyle(color: Colors.white),),
+                            child: Text(_difficultyLabel(d),style: TextStyle(color: Colors.white),),
                           ),
                         )
                         .toList(),
@@ -299,7 +292,18 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
     );
   }
 
-
+  String _difficultyLabel(HabitDifficulty d) {
+    switch (d) {
+      case HabitDifficulty.easy:
+        return 'Facil';
+      case HabitDifficulty.normal:
+        return 'Normal';
+      case HabitDifficulty.hard:
+        return 'Dificil';
+      case HabitDifficulty.legendary:
+        return 'Legendario';
+    }
+  }
 
   String _scheduleLabel(HabitSchedule s) {
     switch (s.frequency) {
@@ -339,18 +343,3 @@ String _daysFull(List<DateTime> days) {
 
   
 }
-
-
-
-  String difficultyLabel(HabitDifficulty d) {
-    switch (d) {
-      case HabitDifficulty.easy:
-        return 'Facil';
-      case HabitDifficulty.normal:
-        return 'Normal';
-      case HabitDifficulty.hard:
-        return 'Dificil';
-      case HabitDifficulty.legendary:
-        return 'Legendario';
-    }
-  }

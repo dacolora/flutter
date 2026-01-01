@@ -48,6 +48,28 @@ class Habit {
     required this.createdAt,
   });
 
+  Habit update({
+  String? title,
+  String? description,
+  LifeArea? area,
+  HabitSchedule? schedule,
+  HabitDifficulty? difficulty,
+  HabitRewards? rewards,
+  HabitPenalties? penalties,
+  bool? isActive,
+}) {
+  return copyWith(
+    title: title,
+    description: description,
+    area: area,
+    schedule: schedule,
+    difficulty: difficulty,
+    rewards: rewards,
+    penalties: penalties,
+    isActive: isActive,
+  );
+}
+
   factory Habit.create({
     required String title,
     String? description,

@@ -1,4 +1,5 @@
 import 'package:mylifegame/domain/entities/action_entry.dart';
+import 'package:mylifegame/domain/entities/habit.dart';
 import 'package:mylifegame/domain/entities/life_area.dart';
 
 import '../../core/constants.dart';
@@ -59,6 +60,39 @@ factory PlayerState.initial(List<LifeArea> lifeAreas) {
   return PlayerState(hp: AppConstants.maxHp, varos: 0, areas: map, history: []);
 }
 
+void updateAreaProgress(List<Habit> habits) {
+  // Resetea el progreso de todas las áreas
+  final updatedAreas = Map<LifeArea, AreaProgress>.from(areas);
+
+  for (final habit in habits) {
+      print('Hábito: ${habit.title}, Área: ${habit.area?.label}, XP: ${habit.rewards.xp}');
+
+    if (habit.area != null) {
+      final area = habit.area!;
+      final xp = habit.rewards.xp;
+
+      // Suma el XP al progreso del área correspondiente
+      final currentProgress = updatedAreas[area]!;
+      final newXpInLevel = currentProgress.xpInLevel + xp;
+
+      // Verifica si el XP acumulado supera el nivel actual
+      if (newXpInLevel >= currentProgress.xpToNext) {
+        updatedAreas[area] = currentProgress.copyWith(
+          level: currentProgress.level + 1,
+          xpInLevel: newXpInLevel - currentProgress.xpToNext,
+        );
+      } else {
+        updatedAreas[area] = currentProgress.copyWith(
+          xpInLevel: newXpInLevel,
+        );
+      }
+    }
+  }
+
+  // Actualiza las áreas con el nuevo progreso
+  areas.clear();
+  areas.addAll(updatedAreas);
+}
 
 
   PlayerState copyWith({

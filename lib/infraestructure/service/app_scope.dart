@@ -72,6 +72,8 @@ class _AppScopeState extends State<AppScope> {
         toggleHabitForDay: toggle, lifeAreas: lifeAreas, habitStateController: habitStateController,
       );
 
+
+
       _controllers = AppControllers(
         habitRepo: habitRepo,
         gameRepo: gameRepo,
@@ -80,7 +82,7 @@ class _AppScopeState extends State<AppScope> {
       );
 
       // load initial
-      habitController.load();
+              await habitController.loadHabitsFromSharedPreferences(gameController.state);
     } catch (e, stackTrace) {
       print('Error during boot: $e');
       print(stackTrace);

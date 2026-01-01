@@ -46,6 +46,16 @@ class LifeArea {
 
   LifeArea({required this.id, required this.label});
 
+    @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! LifeArea) return false;
+    return id == other.id; // Compara por ID
+  }
+
+    @override
+  int get hashCode => id.hashCode;
+
   factory LifeArea.fromJson(Map<String, dynamic> json) {
     return LifeArea(
       id: json['id'] as String,

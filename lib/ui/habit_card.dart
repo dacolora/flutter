@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifegame/infraestructure/habit_state_controller.dart';
+import 'package:mylifegame/ui/habit_add_screen.dart';
 import 'package:mylifegame/ui/habit_history_screen.dart';
 import 'package:mylifegame/ui/habit_month.dart';
 import 'package:mylifegame/ui/ui_token.dart';
@@ -29,6 +30,7 @@ class HabitCard extends StatelessWidget {
     final area = habit.area;
     final areaLabel = area?.label ?? 'Sin área';
 
+    final _difficulty = habit.difficulty ;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -43,24 +45,18 @@ class HabitCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
               ),
             ),
-            if (!isDueToday)
-              const Padding(
-                padding: EdgeInsets.only(left: 8),
-                child: Text('OFF', style: TextStyle(color: UiTokens.textSoft, fontWeight: FontWeight.w800)),
-              )
+                   Text(areaLabel, style: const TextStyle(color: UiTokens.textSoft,fontWeight: FontWeight.bold, )),
+
+                   Text('-', style: const TextStyle(color: UiTokens.textSoft,fontWeight: FontWeight.bold, )),
+                   Text(
+                    difficultyLabel(_difficulty),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+
           ],
         ),
         const SizedBox(height: 8),
-        Text(areaLabel, style: const TextStyle(color: UiTokens.textSoft)),
-        const SizedBox(height: 10),
-        XpVarosPills(
-          xp: habit.rewards.xp,
-          varos: habit.rewards.varos,
-          hp: habit.rewards.hp,
-          xpLoss: habit.penalties.xpLoss,
-          hpLoss: habit.penalties.hpLoss,
-        ),
-        const SizedBox(height: 10),
+
         WeekDots(
           days: weekDays,
           statusOf: statusOf,

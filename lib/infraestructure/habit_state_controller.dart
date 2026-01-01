@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mylifegame/core/time.dart';
+import 'package:mylifegame/domain/entities/habit.dart';
 import 'package:mylifegame/domain/entities/habit_log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,10 @@ Future<void> saveLogs() async {
   await prefs.setString('logs', jsonEncode(logsJson));
   print('Logs guardados: $_logs');
 }
+
+
+
+
 
 Future<void> loadLogs() async {
   final prefs = await SharedPreferences.getInstance();
