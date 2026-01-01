@@ -9,6 +9,6 @@ class AppConstants {
   /// You can replace with any formula later.
   static int xpToNextLevel(int level) {
     // Level 1->2: 120, 2->3: 160, ... grows slowly
-    return 80 + (level * 40);
+    return 800 + (level * 840);
   }
 }

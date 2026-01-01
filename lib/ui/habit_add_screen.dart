@@ -41,8 +41,7 @@ class _HabitAddScreenState extends State<HabitAddScreen> {
   }
 
   Future<void> _loadLifeAreas() async {
-    final repository = LifeAreaRepository();
-    final areas = await repository.getLifeAreas();
+    final areas =  defaultLifeAreas();
     setState(() {
       _lifeAreas = areas;
     });

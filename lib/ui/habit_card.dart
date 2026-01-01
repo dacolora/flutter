@@ -28,7 +28,7 @@ class HabitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final area = habit.area;
-    final areaLabel = area?.label ?? 'Sin área';
+    final areaLabel = area?.name ?? 'Sin área';
 
     final _difficulty = habit.difficulty ;
 

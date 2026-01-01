@@ -12,6 +12,8 @@ class HabitStateController extends ChangeNotifier {
     loadLogs(); // Carga los logs al inicializar el controlador
   }
 
+  
+
 
   // Agregar o actualizar un log
   void setLog(String habitId, DateTime day, HabitDayStatus status) {

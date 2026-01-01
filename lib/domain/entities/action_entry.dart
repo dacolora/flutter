@@ -54,7 +54,7 @@ class ActionEntry {
         'id': id,
         'title': title,
         'type': type.name,
-        'area': area?.id,
+        'area': area?.name,
         'hpDelta': hpDelta,
         'varosDelta': varosDelta,
         'xpDelta': xpDelta,
@@ -68,7 +68,7 @@ class ActionEntry {
         type: ActionType.values.firstWhere((e) => e.name == json['type']),
   area: json['area'] == null
       ? null
-      : lifeAreas.firstWhere((e) => e.id == json['area']),
+      : lifeAreas.firstWhere((e) => e.name == json['area']),
         hpDelta: (json['hpDelta'] as num).toInt(),
         varosDelta: (json['varosDelta'] as num).toInt(),
         xpDelta: (json['xpDelta'] as num).toInt(),

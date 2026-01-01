@@ -12,10 +12,10 @@ class HabitRewards {
 
   Map<String, dynamic> toJson() => {'xp': xp, 'varos': varos, 'hp': hp};
   static HabitRewards fromJson(Map<String, dynamic> json) => HabitRewards(
-        xp: (json['xp'] as num).toInt(),
-        varos: (json['varos'] as num).toInt(),
-        hp: (json['hp'] as num?)?.toInt() ?? 0,
-      );
+    xp: (json['xp'] as num).toInt(),
+    varos: (json['varos'] as num).toInt(),
+    hp: (json['hp'] as num?)?.toInt() ?? 0,
+  );
 }
 
 /// Penalties por fallar.
@@ -27,9 +27,9 @@ class HabitPenalties {
 
   Map<String, dynamic> toJson() => {'xpLoss': xpLoss, 'hpLoss': hpLoss};
   static HabitPenalties fromJson(Map<String, dynamic> json) => HabitPenalties(
-        xpLoss: (json['xpLoss'] as num).toInt(),
-        hpLoss: (json['hpLoss'] as num).toInt(),
-      );
+    xpLoss: (json['xpLoss'] as num).toInt(),
+    hpLoss: (json['hpLoss'] as num).toInt(),
+  );
 }
 
 enum HabitDifficulty { easy, normal, hard, legendary }
@@ -49,26 +49,26 @@ class Habit {
   });
 
   Habit update({
-  String? title,
-  String? description,
-  LifeArea? area,
-  HabitSchedule? schedule,
-  HabitDifficulty? difficulty,
-  HabitRewards? rewards,
-  HabitPenalties? penalties,
-  bool? isActive,
-}) {
-  return copyWith(
-    title: title,
-    description: description,
-    area: area,
-    schedule: schedule,
-    difficulty: difficulty,
-    rewards: rewards,
-    penalties: penalties,
-    isActive: isActive,
-  );
-}
+    String? title,
+    String? description,
+    LifeArea? area,
+    HabitSchedule? schedule,
+    HabitDifficulty? difficulty,
+    HabitRewards? rewards,
+    HabitPenalties? penalties,
+    bool? isActive,
+  }) {
+    return copyWith(
+      title: title,
+      description: description,
+      area: area,
+      schedule: schedule,
+      difficulty: difficulty,
+      rewards: rewards,
+      penalties: penalties,
+      isActive: isActive,
+    );
+  }
 
   factory Habit.create({
     required String title,
@@ -131,30 +131,43 @@ class Habit {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'area': area?.id,
-        'schedule': schedule.toJson(),
-        'difficulty': difficulty.name,
-        'rewards': rewards.toJson(),
-        'penalties': penalties.toJson(),
-        'isActive': isActive,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'title': title,
+    'description': description,
+    'area': area?.name,
+    'schedule': schedule.toJson(),
+    'difficulty': difficulty.name,
+    'rewards': rewards.toJson(),
+    'penalties': penalties.toJson(),
+    'isActive': isActive,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
-  static Habit fromJson(Map<String, dynamic> json, List<LifeArea> lifeAreas) => Habit(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        description: json['description'] as String?,
-        area: json['area'] == null ? null : lifeAreas.firstWhere((e) => e.id == json['area']),
-        schedule: HabitSchedule.fromJson((json['schedule'] as Map).cast<String, dynamic>()),
-        difficulty: HabitDifficulty.values.firstWhere((e) => e.name == json['difficulty']),
-        rewards: HabitRewards.fromJson((json['rewards'] as Map).cast<String, dynamic>()),
-        penalties: HabitPenalties.fromJson((json['penalties'] as Map).cast<String, dynamic>()),
-        isActive: json['isActive'] as bool,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-      );
+  static Habit fromJson(Map<String, dynamic> json, List<LifeArea> lifeAreas) {
+    print(json['area'] == null);
+    print('area ${json['area']}');
+    return Habit(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+
+      schedule: HabitSchedule.fromJson(
+        (json['schedule'] as Map).cast<String, dynamic>(),
+      ),
+      area: LifeArea.values.firstWhere((e) => e.name == json['area']),
+      difficulty: HabitDifficulty.values.firstWhere(
+        (e) => e.name == json['difficulty'],
+      ),
+      rewards: HabitRewards.fromJson(
+        (json['rewards'] as Map).cast<String, dynamic>(),
+      ),
+      penalties: HabitPenalties.fromJson(
+        (json['penalties'] as Map).cast<String, dynamic>(),
+      ),
+      isActive: json['isActive'] as bool,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
 
   static HabitRewards _defaultRewards(HabitDifficulty d) {
     switch (d) {
@@ -173,7 +186,9 @@ class Habit {
   /// Ej: si gana 25 XP, perder 15 XP (≈ 0.6x).
   static HabitPenalties _defaultPenalties(HabitRewards r) {
     final xpLoss = (r.xp * 0.6).round();
-    final hpLoss = (r.hp > 0 ? (r.hp * 2) : 10); // hábitos “curativos” fallados duelen un poco más.
+    final hpLoss = (r.hp > 0
+        ? (r.hp * 2)
+        : 10); // hábitos “curativos” fallados duelen un poco más.
     return HabitPenalties(xpLoss: xpLoss, hpLoss: hpLoss);
   }
 }

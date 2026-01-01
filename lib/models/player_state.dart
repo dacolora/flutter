@@ -24,13 +24,13 @@ class AreaProgress {
       );
 
   Map<String, dynamic> toJson() => {
-        'area': area.id,
+        'area': area.name,
         'level': level,
         'xpInLevel': xpInLevel,
       };
 
   static AreaProgress fromJson(Map<String, dynamic> json, List<LifeArea> lifeAreas) {
-  final area = lifeAreas.firstWhere((e) => e.id == json['area']);
+  final area = lifeAreas.firstWhere((e) => e.name == json['area']);
   return AreaProgress(
     area: area,
     level: (json['level'] as num).toInt(),
@@ -114,7 +114,7 @@ void updateAreaProgress(List<Habit> habits) {
   Map<String, dynamic> toJson() => {
         'hp': hp,
         'varos': varos,
-        'areas': areas.map((k, v) => MapEntry(k.id, v.toJson())),
+        'areas': areas.map((k, v) => MapEntry(k.name, v.toJson())),
         'history': history.map((e) => e.toJson()).toList(),
       };
 
@@ -122,7 +122,7 @@ static PlayerState fromJson(Map<String, dynamic> json, List<LifeArea> lifeAreas)
   final areasJson = (json['areas'] as Map).cast<String, dynamic>();
   final areaMap = <LifeArea, AreaProgress>{};
   for (final entry in areasJson.entries) {
-    final area = lifeAreas.firstWhere((e) => e.id == entry.key);
+    final area = lifeAreas.firstWhere((e) => e.name == entry.key);
     areaMap[area] = AreaProgress.fromJson((entry.value as Map).cast<String, dynamic>(), lifeAreas);
   }
   final hist = (json['history'] as List<dynamic>)

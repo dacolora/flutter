@@ -47,8 +47,8 @@ class _HabitEditScreenState extends State<HabitEditScreen> {
   }
 
   Future<void> _loadLifeAreas() async {
-    final repository = LifeAreaRepository();
-    final areas = await repository.getLifeAreas();
+
+    final areas =  defaultLifeAreas();
     setState(() {
       _lifeAreas = areas;
     });
@@ -80,6 +80,32 @@ class _HabitEditScreenState extends State<HabitEditScreen> {
     Navigator.pop(context); // Regresa a la pantalla anterior
   }
 
+  void _deleteHabit() async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Eliminar Hábito'),
+      content: const Text('¿Estás seguro de que deseas eliminar este hábito? Esta acción no se puede deshacer.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+
+  if (confirm == true) {
+    final habits = AppScope.of(context).habitController;
+    habits.deleteHabit(widget.habit.id); // Llama al método para eliminar el hábito
+    Navigator.pop(context); // Regresa a la pantalla anterior
+  }
+}
+
 
 
   @override
@@ -103,6 +129,10 @@ class _HabitEditScreenState extends State<HabitEditScreen> {
               ),
             ),
           ),
+              IconButton(
+      icon: const Icon(Icons.delete, color: Colors.red),
+      onPressed: _deleteHabit, // Llama al método para eliminar el hábito
+    ),
         ],
       ),
       body: ListView(

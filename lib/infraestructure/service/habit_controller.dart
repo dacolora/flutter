@@ -61,6 +61,69 @@ int calculateTotalRewards(String habitId) {
     return sum;
   });
 }
+
+int calculateTotalRewardsByArea(LifeArea area) {
+  int totalRewards = 0;
+
+  // Filtra los hábitos asociados al área
+  final areaHabits = habits.where((habit) => habit.area == area).toList();
+
+  for (final habit in areaHabits) {
+    // Obtén los logs del hábito
+    final logs = _stateController.getLogsForHabit(habit.id);
+
+    // Suma los XP de los días completados
+    for (final log in logs) {
+      if (log.status == HabitDayStatus.done) {
+        totalRewards += habit.rewards.xp;
+      }
+            if (log.status == HabitDayStatus.missed) {
+        totalRewards -= habit.penalties.xpLoss;
+      }
+    }
+  }
+
+  return totalRewards;
+}
+
+int calculateHPCOMPLETE() {
+  int totalHP = 100; // HP inicial
+
+  for (final log in _logs) {
+    final habit = habits.firstWhere((h) => h.id == log.habitId, );
+    if (habit != null) {
+      if (log.status == HabitDayStatus.done) {
+        totalHP += habit.rewards.hp; // Suma HP por hábitos completados
+      } else if (log.status == HabitDayStatus.missed) {
+        totalHP -= habit.penalties.hpLoss; // Resta HP por hábitos fallidos
+      }
+    }
+  }
+
+  return totalHP;
+}
+
+int calculateVarosCOMPLETE() {
+  int totalVaros = 0;
+
+  for (final log in _logs) {
+ 
+      final habit = habits.firstWhere((h) => h.id == log.habitId);
+    
+        totalVaros += habit.rewards.varos;
+      
+    
+  }
+
+  return totalVaros;
+}
+
+
+void deleteHabit(String habitId) async {
+  habits.removeWhere((habit) => habit.id == habitId); // Elimina el hábito de la lista
+  await _saveHabitsToSharedPreferences(); // Guarda los cambios en SharedPreferences
+  notifyListeners(); // Notifica a la UI para que se redibuje
+}
   Future<void> createHabit(Habit habit) async {
     habits.add(habit); // Agrega el hábito a la lista en memoria
     await _saveHabitsToSharedPreferences(); // Guarda los hábitos en SharedPreferences
@@ -152,6 +215,8 @@ int calculateTotalVaros(String habitId) {
       (index) => DateTime(year, month, index + 1),
     );
   }
+
+  
 
   HabitDayStatus getStatusForDay(String habitId, DateTime day) {
     // Obtén el estado del día desde los logs o devuelve un estado predeterminado

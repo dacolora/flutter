@@ -14,7 +14,7 @@ class LogActionScreen extends StatefulWidget {
 class _LogActionScreenState extends State<LogActionScreen> {
   ActionType _type = ActionType.goodHabit;
   LifeArea? _area;
-  final List<LifeArea> _lifeAreas = LifeAreaRepository.defaultLifeAreas();
+  final List<LifeArea> _lifeAreas = defaultLifeAreas();
 
   final _title = TextEditingController();
   final _notes = TextEditingController();
@@ -133,16 +133,16 @@ class _LogActionScreenState extends State<LogActionScreen> {
       showDragHandle: true,
       builder: (ctx) {
               final healthArea = _lifeAreas.firstWhere(
-        (a) => a.id == 'health',
-        orElse: () => LifeArea(id: 'health', label: 'Salud'),
+        (a) => a.name == 'Salud',
+        orElse: () => LifeArea.Salud,
       );
       final mindArea = _lifeAreas.firstWhere(
-        (a) => a.id == 'mind',
-        orElse: () => LifeArea(id: 'mind', label: 'Mente'),
+        (a) => a.name == 'Mente',
+        orElse: () => LifeArea.Mente,
       );
       final projectsArea = _lifeAreas.firstWhere(
-        (a) => a.id == 'projects',
-        orElse: () => LifeArea(id: 'projects', label: 'Proyectos'),
+        (a) => a.name == 'Proyectos',
+        orElse: () => LifeArea.Proyectos,
       );
         final presets = <_Preset>[
           _Preset(

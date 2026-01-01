@@ -13,7 +13,7 @@ class StorageRepository {
   StorageRepository(this._storage);
 
   Future<List<LifeArea>> loadLifeAreas() async {
-    return LifeAreaRepository.defaultLifeAreas();
+    return defaultLifeAreas();
   }
 
   Future<PlayerState> loadPlayerState(List<LifeArea> lifeAreas) async {

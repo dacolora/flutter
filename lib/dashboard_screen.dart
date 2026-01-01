@@ -23,7 +23,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppScope.of(context);
     final game = c.gameController;
-
+    final habits = c.habitController;
     final s = game.state;
 
     return AnimatedBuilder(
@@ -73,12 +73,12 @@ class DashboardScreen extends StatelessWidget {
             _TopStatsRow(state: s, game: game),
             StatCard(
               title: 'Varos',
-              value: Fmt.money(s.varos),
+              value: Fmt.money(s.varos), //TODO:
               subtitle: 'Moneda ficticia para placer controlado.',
             ),
             const SectionTitle('Áreas (XP / Nivel)'),
             AreaProgressGroup(),
-                const SectionTitle('Áreas (XP / Nivel)'),
+            const SectionTitle('Áreas (XP / Nivel)'),
             const SectionTitle('Historial (último primero)'),
             ...s.history.take(12).map((e) => _HistoryTile(e)),
             const SizedBox(height: 90),
@@ -90,24 +90,26 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-
 class AreaProgressGroup extends StatelessWidget {
-
-    @override
+  @override
   Widget build(BuildContext context) {
     final List<Widget> list = [];
-            final c = AppScope.of(context);
+    final c = AppScope.of(context);
     final game = c.gameController;
+    final habits = c.habitController;
 
     final playerState = game.state;
-        for (final entry in playerState.areas.entries) {
-  final progress = entry.value;
-  list.add(AreaProgressCard(progress: progress));
-}
+    for (final entry in playerState.areas.entries) {
+      final area = entry.key;
 
-    return  Column(children: list,);
-}
+      final progress = entry.value;
+      final xp = habits.calculateTotalRewardsByArea(area);
 
+      list.add(AreaProgressCard(progress: progress, xp: xp));
+    }
+
+    return Column(children: list);
+  }
 }
 
 class _BottomBar extends StatelessWidget {
