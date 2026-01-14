@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mylifegame/create_habit/create_habit_screen.dart';
 import 'package:mylifegame/domain/entities/habit.dart';
 import 'package:mylifegame/domain/entities/habit_log.dart';
 import 'package:mylifegame/infraestructure/service/app_scope.dart';
-import 'package:mylifegame/ui/habit_add_screen.dart';
 import 'package:mylifegame/ui/habit_edit_screen.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import 'package:mylifegame/ui/xp_varos_pills.dart';
@@ -46,13 +46,15 @@ class _HabitsMonthScreenState extends State<HabitsMonthScreen> {
     final monthTitle = DateFormat('MMMM yyyy').format(_visibleMonth);
     final days = _buildCalendarCells(_visibleMonth);
     final habits = AppScope.of(context).habitController;
-    final totalRewards = habits.calculateTotalRewards(widget.habitId);
-    final totalHP = habits.calculateTotalHP(widget.habitId);
-    final totalVaros = habits.calculateTotalVaros(widget.habitId);
+
 
     return AnimatedBuilder(
       animation: habits,
       builder: (context, asyncSnapshot) {
+
+    final totalRewards = habits.calculateTotalRewards(widget.habitId);
+    final totalHP = habits.calculateTotalHP(widget.habitId);
+    final totalVaros = habits.calculateTotalVaros(widget.habitId);
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
@@ -103,11 +105,11 @@ class _HabitsMonthScreenState extends State<HabitsMonthScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
-                  Text(
-                   'Dificultad: ${difficultyLabel(widget.habit.difficulty)}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                     const SizedBox(height: 10),
+                Text(
+                  'Dificultad: ${difficultyLabel(widget.habit.difficulty)}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 10),
 
                 XpVarosPills(
                   xp: widget.habit.rewards.xp,
@@ -226,47 +228,52 @@ class _HabitsMonthScreenState extends State<HabitsMonthScreen> {
                     ),
                   ),
                 ),
-                Text(
-                  'Total del Habito',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const Divider(height: 1),
-                const SizedBox(height: 10),
 
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Experiencia : $totalRewards XP',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                AnimatedBuilder(
+                  animation: habits,
+                  builder: (context, asyncSnapshot) {
+                    return Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Total del Habito',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Experiencia : $totalRewards XP',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Vida : $totalHP HP',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Varos : $totalVaros Varos',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        'Vida : $totalHP HP',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Varos : $totalVaros Varos',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
               ],

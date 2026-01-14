@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:mylifegame/area_progess_card.dart';
 import 'package:mylifegame/domain/entities/action_entry.dart';
 import 'package:mylifegame/domain/entities/life_area.dart';
+import 'package:mylifegame/home/widgets/habit_route_card.dart';
 import 'package:mylifegame/infraestructure/service/app_scope.dart';
 import 'package:mylifegame/ui/habit_screen.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import 'package:mylifegame/widgets/section_title.dart';
-import '../../core/constants.dart';
-import '../../core/formatters.dart';
-import '../../models/player_state.dart';
-import 'infraestructure/service/game_controller.dart';
+import '../../../core/formatters.dart';
+import '../../../models/player_state.dart';
+import '../infraestructure/service/game_controller.dart';
 
-import '../widgets/stat_card.dart';
-import 'log_action_screen.dart';
-import 'settings_screen.dart';
-import 'shop_screen.dart';
+import '../../widgets/stat_card.dart';
+import '../log_action_screen.dart';
+import '../settings_screen.dart';
+import '../shop_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -44,13 +44,9 @@ class DashboardScreen extends StatelessWidget {
                 icon: const Icon(Icons.settings),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.grid_view_rounded),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HabitsScreen()),
-              ),
-            ),
+  
+ 
+ 
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
@@ -63,25 +59,47 @@ class DashboardScreen extends StatelessWidget {
           icon: const Icon(Icons.add),
           label: const Text('Registrar'),
         ),
-        body: ListView(
+        body: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: _DeathBanner(state: s),
+             Positioned.fill(
+                child: Image.asset(
+                  "assets/images/background_2.jpeg",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ListView(
+              children: [
+                SizedBox(height: 20,),
+                Container(
+                          alignment: Alignment.center,
+                  child: Image.asset(
+                            'assets/cat/gato.png', // Ruta de la imagen
+                            width: 250,         // Ancho opcional
+                            height: 300,        // Alto opcional
+                            fit: BoxFit.fill,  // Cómo ajustar la imagen
+                          ),
+                ),
+                HabitRouteCard(),
+          
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: _DeathBanner(state: s),
+                ),
+            
+                _TopStatsRow(state: s, game: game),
+                StatCard(
+                  title: 'Varos',
+                  value: Fmt.money(s.varos), //TODO:
+                  subtitle: 'Moneda ficticia para placer controlado.',
+                ),
+                const SectionTitle('Áreas (XP / Nivel)'),
+                AreaProgressGroup(),
+                const SectionTitle('Áreas (XP / Nivel)'),
+                const SectionTitle('Historial (último primero)'),
+                ...s.history.take(12).map((e) => _HistoryTile(e)),
+                const SizedBox(height: 90),
+              ],
             ),
-
-            _TopStatsRow(state: s, game: game),
-            StatCard(
-              title: 'Varos',
-              value: Fmt.money(s.varos), //TODO:
-              subtitle: 'Moneda ficticia para placer controlado.',
-            ),
-            const SectionTitle('Áreas (XP / Nivel)'),
-            AreaProgressGroup(),
-            const SectionTitle('Áreas (XP / Nivel)'),
-            const SectionTitle('Historial (último primero)'),
-            ...s.history.take(12).map((e) => _HistoryTile(e)),
-            const SizedBox(height: 90),
           ],
         ),
         bottomNavigationBar: _BottomBar(),

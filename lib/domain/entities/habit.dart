@@ -144,8 +144,12 @@ class Habit {
   };
 
   static Habit fromJson(Map<String, dynamic> json, List<LifeArea> lifeAreas) {
-    print(json['area'] == null);
-    print('area ${json['area']}');
+
+
+       final area = lifeAreas.firstWhere(
+      (e) => e.name == json['area'], // Busca el área por su ID
+      orElse: () => LifeArea.Amor, // Devuelve un área predeterminada si no se encuentra
+    );
     return Habit(
       id: json['id'] as String,
       title: json['title'] as String,
@@ -154,7 +158,7 @@ class Habit {
       schedule: HabitSchedule.fromJson(
         (json['schedule'] as Map).cast<String, dynamic>(),
       ),
-      area: LifeArea.values.firstWhere((e) => e.name == json['area']),
+      area: area,
       difficulty: HabitDifficulty.values.firstWhere(
         (e) => e.name == json['difficulty'],
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mylifegame/dashboard_screen.dart';
+import 'package:mylifegame/home/dashboard_screen.dart';
 import 'package:mylifegame/infraestructure/service/app_scope.dart';
 import 'package:mylifegame/core/theme.dart';
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mylifegame/create_habit/area_selection_screen.dart';
+import 'package:mylifegame/create_habit/create_habit_screen.dart';
 import 'package:mylifegame/ui/habit_card.dart';
-import 'package:mylifegame/ui/habit_add_screen.dart';
 import 'package:mylifegame/ui/habit_month.dart';
 import 'package:mylifegame/ui/ui_token.dart';
 import '../../core/time.dart';
@@ -33,7 +34,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 icon: const Icon(Icons.add),
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const HabitAddScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const AreaSelectionScreen(),
+                  ),
                 ),
               ),
             ],
@@ -77,7 +80,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
                               day: yearlyStatus.keys.toList(),
                               statusOf: (d) => habits.statusOf(h.id, d),
                               onTapDay: (DateTime d) {
-                                  print('Actualizando estado global para el día: $d');
+                                print(
+                                  'Actualizando estado global para el día: $d',
+                                );
                                 _openDayPicker(context, h.title, (status) {
                                   habits.setStatus(h, d, status);
                                   setState(() {});
@@ -138,17 +143,17 @@ class _HabitsScreenState extends State<HabitsScreen> {
             ),
             const SizedBox(height: 12),
             _PickTile(
-              '✅ Completar',
+              '✅ Completado',
               UiTokens.neonGreen,
               () => onPick(HabitDayStatus.done),
             ),
             _PickTile(
-              '❌ Fallé',
+              '❌ Fallido',
               UiTokens.danger,
               () => onPick(HabitDayStatus.missed),
             ),
             _PickTile(
-              '⏭ Skip (sin castigo)',
+              '🟡 Se hizo algo',
               UiTokens.textSoft,
               () => onPick(HabitDayStatus.skipped),
             ),

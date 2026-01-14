@@ -175,7 +175,7 @@ int calculateTotalHP(String habitId) {
       return sum + habit.rewards.hp; // Usa los rewards del hábito
     }
         if (log.status == HabitDayStatus.missed) {
-      return sum + habit.penalties.hpLoss; // Usa los rewards del hábito
+      return sum - habit.penalties.hpLoss; // Usa los rewards del hábito
     }
     return sum;
   });
